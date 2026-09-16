@@ -17,6 +17,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ companyName?: string, email?: string, phone?: string } | null>(null);
 
   useEffect(() => {
     // Check authentication
@@ -26,7 +27,13 @@ export default function Sidebar() {
     if (!token || accountType !== 'brand') {
       router.replace('/login');
     } else {
-      setLoading(false);
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/brand-profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => setProfile(data))
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }
   }, [router]);
 
@@ -75,10 +82,21 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-4 border-t border-slate-800 space-y-4">
+        {profile && (
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex shrink-0 items-center justify-center text-emerald-400 font-bold border border-emerald-500/30">
+              {(profile.companyName || 'B').charAt(0).toUpperCase()}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-semibold text-white truncate">{profile.companyName || 'Brand Partner'}</p>
+              <p className="text-[11px] text-slate-400 truncate">{profile.email || profile.phone || ''}</p>
+            </div>
+          </div>
+        )}
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-3 px-4 py-3 w-full rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-slate-400 font-medium"
+          className="flex items-center space-x-3 px-4 py-3 w-full rounded-lg hover:bg-slate-800 hover:text-red-400 transition-colors text-slate-400 font-medium"
         >
           <LogOut className="w-5 h-5" />
           <span>Logout</span>

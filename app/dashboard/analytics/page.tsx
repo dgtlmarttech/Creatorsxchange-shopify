@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Filter, Download, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
+import { Filter, Download, ArrowUpRight, ArrowDownRight, Loader2, BarChart3 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface AffiliateLink {
@@ -20,25 +20,46 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState('Last 30 Days');
   const [affiliates, setAffiliates] = useState<AffiliateLink[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isShopifyConnected, setIsShopifyConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.replace('/login');
-      return;
-    }
-    
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopify/affiliates/brand`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.replace('/login');
+        return;
+      }
+      
+      try {
+        const profileRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/brand-profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const profileData = await profileRes.json();
+        
+        if (!profileRes.ok || !profileData.isShopifyConnected) {
+          setIsShopifyConnected(false);
+          setLoading(false);
+          return;
+        }
+
+        setIsShopifyConnected(true);
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopify/affiliates/brand`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
         if (Array.isArray(data)) {
           setAffiliates(data);
         }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [router]);
 
   if (loading) {
@@ -80,50 +101,68 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-semibold text-slate-500 mb-2">Average Order Value (AOV)</p>
-          <div className="flex items-end justify-between">
-            <h3 className="text-3xl font-bold text-slate-800">₹{aov.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+      {isShopifyConnected === false ? (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center max-w-2xl mx-auto mt-10">
+          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <BarChart3 className="w-8 h-8 text-amber-600" />
           </div>
+          <h3 className="text-xl font-bold text-amber-900 mb-2">Store Not Connected</h3>
+          <p className="text-amber-700 mb-6">You need to connect your Shopify store to view analytics data.</p>
+          <button
+            onClick={() => router.push('/dashboard/store')}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          >
+            Connect Store Now
+          </button>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-semibold text-slate-500 mb-2">Overall Conversion Rate</p>
-          <div className="flex items-end justify-between">
-            <h3 className="text-3xl font-bold text-slate-800">{conversionRate.toFixed(2)}%</h3>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-sm font-semibold text-slate-500 mb-2">Average Order Value (AOV)</p>
+              <div className="flex items-end justify-between">
+                <h3 className="text-3xl font-bold text-slate-800">₹{aov.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-sm font-semibold text-slate-500 mb-2">Overall Conversion Rate</p>
+              <div className="flex items-end justify-between">
+                <h3 className="text-3xl font-bold text-slate-800">{conversionRate.toFixed(2)}%</h3>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-sm font-semibold text-slate-500 mb-2">Avg Clicks per Link</p>
+              <div className="flex items-end justify-between">
+                <h3 className="text-3xl font-bold text-slate-800">{Math.round(avgClicksPerLink)}</h3>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-semibold text-slate-500 mb-2">Avg Clicks per Link</p>
-          <div className="flex items-end justify-between">
-            <h3 className="text-3xl font-bold text-slate-800">{Math.round(avgClicksPerLink)}</h3>
-          </div>
-        </div>
-      </div>
 
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
-        <h3 className="text-lg font-bold text-slate-800 mb-6">Clicks vs Sales (Top 10 Links)</h3>
-        {conversionData.length > 0 ? (
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={conversionData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis yAxisId="left" orientation="left" stroke="#64748b" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                <YAxis yAxisId="right" orientation="right" stroke="#10b981" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
-                <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
-                <Bar yAxisId="left" dataKey="clicks" name="Total Clicks" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar yAxisId="right" dataKey="conversions" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+            <h3 className="text-lg font-bold text-slate-800 mb-6">Clicks vs Sales (Top 10 Links)</h3>
+            {conversionData.length > 0 ? (
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={conversionData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                    <YAxis yAxisId="left" orientation="left" stroke="#64748b" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#10b981" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
+                    <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                    <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
+                    <Bar yAxisId="left" dataKey="clicks" name="Total Clicks" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    <Bar yAxisId="right" dataKey="conversions" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center text-slate-400">
+                No link data available to chart.
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="h-64 flex items-center justify-center text-slate-400">
-            No link data available to chart.
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
