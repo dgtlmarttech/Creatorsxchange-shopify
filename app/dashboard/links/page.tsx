@@ -9,6 +9,10 @@ interface ShopifyProduct {
   handle: string;
   imageUrl: string | null;
   price?: string;
+  compareAtPrice?: string;
+  status?: string;
+  inventoryQuantity?: number;
+  currency?: string;
 }
 
 interface AffiliateLink {
@@ -118,6 +122,15 @@ export default function ProductsAndLinksPage() {
     return url;
   };
 
+  const formatPrice = (priceStr: string | undefined, currency: string = 'USD') => {
+    if (!priceStr) return '';
+    try {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(parseFloat(priceStr));
+    } catch (e) {
+      return `${currency} ${priceStr}`;
+    }
+  };
+
   const filteredProducts = products.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (loading) {
@@ -181,9 +194,31 @@ export default function ProductsAndLinksPage() {
                       <Package className="w-12 h-12 opacity-50" />
                     </div>
                   )}
+                  <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+                    {product.status && product.status !== 'active' && (
+                      <span className="bg-slate-800/90 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                        {product.status}
+                      </span>
+                    )}
+                    {product.inventoryQuantity !== undefined && product.inventoryQuantity <= 0 ? (
+                      <span className="bg-red-500/90 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                        Sold Out
+                      </span>
+                    ) : (
+                      product.inventoryQuantity !== undefined && product.inventoryQuantity > 0 && (
+                        <span className="bg-emerald-500/90 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                          {product.inventoryQuantity} In Stock
+                        </span>
+                      )
+                    )}
+                  </div>
+                  
                   {product.price && (
-                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-800">
-                      {product.price}
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded shadow-sm text-slate-800 flex items-center gap-1.5">
+                      {product.compareAtPrice && parseFloat(product.compareAtPrice) > parseFloat(product.price) && (
+                        <span className="text-xs text-slate-400 line-through">{formatPrice(product.compareAtPrice, product.currency)}</span>
+                      )}
+                      <span className="text-xs font-bold">{formatPrice(product.price, product.currency)}</span>
                     </div>
                   )}
                 </div>
