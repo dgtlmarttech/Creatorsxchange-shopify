@@ -76,7 +76,11 @@ export default function DashboardOverview() {
   // We will build a chart of top 7 links by revenue instead.
   
   const topLinksChart = [...affiliates]
-    .sort((a, b) => b.totalRevenueGenerated - a.totalRevenueGenerated)
+    .sort((a, b) => {
+      if (b.totalRevenueGenerated !== a.totalRevenueGenerated) return b.totalRevenueGenerated - a.totalRevenueGenerated;
+      if (b.productSalesCount !== a.productSalesCount) return b.productSalesCount - a.productSalesCount;
+      return b.clicks - a.clicks;
+    })
     .slice(0, 7)
     .map(a => ({
       name: a.shopifyProductHandle || a.discountCode,
@@ -84,7 +88,11 @@ export default function DashboardOverview() {
     }));
 
   const topLinksList = [...affiliates]
-    .sort((a, b) => b.totalRevenueGenerated - a.totalRevenueGenerated)
+    .sort((a, b) => {
+      if (b.totalRevenueGenerated !== a.totalRevenueGenerated) return b.totalRevenueGenerated - a.totalRevenueGenerated;
+      if (b.productSalesCount !== a.productSalesCount) return b.productSalesCount - a.productSalesCount;
+      return b.clicks - a.clicks;
+    })
     .slice(0, 4);
 
   return (

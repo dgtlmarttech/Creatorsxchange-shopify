@@ -263,7 +263,7 @@ export default function ProductsAndLinksPage() {
                   onClick={() => setIsAddingNew(!isAddingNew)}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  {isAddingNew ? 'Cancel' : 'Generate New Link'}
+                  {isAddingNew ? 'Cancel' : 'Generate Link'}
                 </button>
                 <button onClick={() => { setSelectedProduct(null); setIsAddingNew(false); }} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
                   <X className="w-5 h-5" />
@@ -274,7 +274,7 @@ export default function ProductsAndLinksPage() {
             <div className="p-6 overflow-y-auto flex-1">
               {isAddingNew && (
                 <div className="mb-8 p-5 bg-emerald-50 rounded-xl border border-emerald-100">
-                  <h3 className="font-bold text-emerald-900 mb-4">Generate Manual Affiliate Link</h3>
+                  <h3 className="font-bold text-emerald-900 mb-4">Generate Link</h3>
                   {generateError && <p className="text-red-500 text-sm mb-3">{generateError}</p>}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
