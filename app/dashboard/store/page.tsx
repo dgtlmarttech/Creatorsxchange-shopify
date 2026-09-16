@@ -50,7 +50,7 @@ export default function StoreConnectionPage() {
 
   const handleConnectShopify = () => {
     if (!shopUrl) {
-      setMessage({ text: 'Please enter your Store URL (e.g. your-store.com)', type: 'error' });
+      setMessage({ text: 'Please enter your Store URL (e.g. your-store.myshopify.com)', type: 'error' });
       return;
     }
     
@@ -160,10 +160,10 @@ export default function StoreConnectionPage() {
               <div className="flex flex-col sm:flex-row gap-3 max-w-lg">
                 <input
                   type="text"
-                  placeholder="your-store.com"
+                  placeholder="your-store.myshopify.com"
                   value={shopUrl}
                   onChange={(e) => setShopUrl(e.target.value)}
-                  className="flex-1 border border-slate-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  className="flex-1 border border-slate-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-900 bg-white"
                 />
                 <button
                   onClick={handleConnectShopify}
@@ -174,7 +174,7 @@ export default function StoreConnectionPage() {
                   Connect Store
                 </button>
               </div>
-              <p className="text-xs text-slate-500 mt-2">Example: your-brand.com</p>
+              <p className="text-xs text-slate-500 mt-2">Example: your-store.myshopify.com</p>
             </div>
           )}
         </div>

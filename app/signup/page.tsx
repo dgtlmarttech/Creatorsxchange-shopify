@@ -242,7 +242,7 @@ export default function SignupPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="John Doe" required />
+                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-900 bg-white" placeholder="John Doe" required />
               </div>
             </div>
 
@@ -257,7 +257,7 @@ export default function SignupPage() {
                       value={phone} 
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} 
                       disabled={phoneOtpVerified}
-                      className={`w-full pl-10 pr-4 py-3 border ${phoneOtpVerified ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-white border-gray-300'} rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors disabled:opacity-80`} 
+                      className={`w-full pl-10 pr-4 py-3 border ${phoneOtpVerified ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-white border-gray-300 text-gray-900'} rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors disabled:opacity-80`} 
                       placeholder="10-digit number" 
                       required 
                     />
@@ -285,7 +285,7 @@ export default function SignupPage() {
                       value={phoneOtp}
                       onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
                       placeholder="4-digit OTP"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-center font-mono tracking-widest outline-none"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-center font-mono tracking-widest outline-none text-gray-900 bg-white"
                       maxLength={4}
                     />
                     <button
@@ -310,7 +310,7 @@ export default function SignupPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Business Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="name@company.com" required />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-900 bg-white" placeholder="name@company.com" required />
               </div>
             </div>
 
@@ -318,7 +318,7 @@ export default function SignupPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <div className="relative">
                 <Shield className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="••••••••" required />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-gray-900 bg-white" placeholder="••••••••" required />
               </div>
             </div>
 
@@ -372,7 +372,7 @@ export default function SignupPage() {
                   maxLength={6}
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-full text-center text-3xl font-mono tracking-[0.5em] px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                  className="w-full text-center text-3xl font-mono tracking-[0.5em] px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-gray-900 bg-white"
                   placeholder="------"
                   required
                 />
