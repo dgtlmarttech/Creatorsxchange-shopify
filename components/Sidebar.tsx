@@ -27,11 +27,21 @@ export default function Sidebar() {
     if (!token || accountType !== 'brand') {
       router.replace('/login');
     } else {
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/brand-profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then(data => setProfile(data))
+      Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/brand-profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(res => res.json()),
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(res => res.json())
+      ])
+        .then(([profileData, userData]) => {
+          setProfile({
+            ...profileData,
+            email: userData?.email,
+            phone: userData?.phone
+          });
+        })
         .catch(console.error)
         .finally(() => setLoading(false));
     }

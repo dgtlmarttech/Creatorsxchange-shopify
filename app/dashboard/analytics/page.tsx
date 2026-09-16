@@ -62,6 +62,34 @@ export default function AnalyticsPage() {
     fetchData();
   }, [router]);
 
+  const handleExportCSV = () => {
+    if (!affiliates || affiliates.length === 0) return;
+
+    const headers = ['Link Name/Product', 'Discount Code', 'Clicks', 'Sales', 'Total Revenue', 'Date Created'];
+    const rows = affiliates.map(a => [
+      a.shopifyProductHandle || a.discountCode,
+      a.discountCode,
+      a.clicks.toString(),
+      a.productSalesCount.toString(),
+      (a.totalRevenueGenerated || 0).toFixed(2),
+      new Date(a.createdAt).toLocaleDateString()
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `analytics_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
      return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
   }
@@ -95,7 +123,11 @@ export default function AnalyticsPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <button className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 py-2 px-4 rounded-lg font-medium flex items-center gap-2 transition-colors">
+          <button 
+            onClick={handleExportCSV}
+            disabled={!affiliates || affiliates.length === 0}
+            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 py-2 px-4 rounded-lg font-medium flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Download className="w-4 h-4" /> Export CSV
           </button>
         </div>
