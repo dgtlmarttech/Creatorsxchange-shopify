@@ -13,6 +13,16 @@ export default function StoreConnectionPage() {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setActionLoading(false);
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
+  useEffect(() => {
     const fetchBrandProfile = async () => {
       try {
         const token = localStorage.getItem('token');
