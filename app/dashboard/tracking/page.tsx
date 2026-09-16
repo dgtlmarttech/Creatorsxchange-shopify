@@ -106,11 +106,20 @@ export default function TrackingPage() {
     setExpandedGroups(newSet);
   };
 
+  const getDisplayUrl = (url: string | undefined) => {
+    if (!url) return '';
+    if (url.includes('localhost:3001')) {
+      return url.replace('http://localhost:3001', 'https://shop.creatorsxchange.com');
+    }
+    return url;
+  };
+
   const copyToClipboard = (url: string | undefined, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!url) return;
-    navigator.clipboard.writeText(url);
-    setCopiedLink(url);
+    const finalUrl = getDisplayUrl(url);
+    if (!finalUrl) return;
+    navigator.clipboard.writeText(finalUrl);
+    setCopiedLink(finalUrl);
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
@@ -145,7 +154,7 @@ export default function TrackingPage() {
             placeholder="Search product or code..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none w-full md:w-72 shadow-sm transition-all bg-white"
+            className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none w-full md:w-72 shadow-sm transition-all bg-white text-slate-900"
           />
         </div>
       </div>
@@ -244,7 +253,7 @@ export default function TrackingPage() {
                                   className="text-slate-400 hover:text-emerald-600 transition-colors"
                                   title="Copy Affiliate Link"
                                 >
-                                  {copiedLink === link.trackingUrl ? (
+                                  {copiedLink === getDisplayUrl(link.trackingUrl) ? (
                                     <span className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">Copied!</span>
                                   ) : (
                                     <ExternalLink className="w-4 h-4" />

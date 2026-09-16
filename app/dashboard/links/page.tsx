@@ -108,6 +108,16 @@ export default function ProductsAndLinksPage() {
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
+  const getDisplayUrl = (link: AffiliateLink) => {
+    let url = link.trackingUrl;
+    if (!url) return `https://${shopifyDomain}/discount/${link.discountCode}?redirect=/products/${selectedProduct?.handle}`;
+    // Replace hardcoded localhost from old database entries
+    if (url.includes('localhost:3001')) {
+      return url.replace('http://localhost:3001', 'https://shop.creatorsxchange.com');
+    }
+    return url;
+  };
+
   const filteredProducts = products.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (loading) {
@@ -134,7 +144,7 @@ export default function ProductsAndLinksPage() {
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
+              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white text-slate-900"
             />
           </div>
         )}
@@ -234,15 +244,15 @@ export default function ProductsAndLinksPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                       <label className="block text-xs font-semibold text-emerald-800 mb-1">Influencer Name</label>
-                      <input type="text" value={newCreatorName} onChange={e => setNewCreatorName(e.target.value)} placeholder="e.g. John Doe" className="w-full px-3 py-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                      <input type="text" value={newCreatorName} onChange={e => setNewCreatorName(e.target.value)} placeholder="e.g. John Doe" className="w-full px-3 py-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm bg-white text-emerald-900" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-emerald-800 mb-1">Discount Code</label>
-                      <input type="text" value={newDiscountCode} onChange={e => setNewDiscountCode(e.target.value.toUpperCase())} placeholder="e.g. JOHN20" className="w-full px-3 py-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm uppercase" />
+                      <input type="text" value={newDiscountCode} onChange={e => setNewDiscountCode(e.target.value.toUpperCase())} placeholder="e.g. JOHN20" className="w-full px-3 py-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm uppercase bg-white text-emerald-900" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-emerald-800 mb-1">Commission %</label>
-                      <input type="number" value={newCommission} onChange={e => setNewCommission(e.target.value)} min="1" max="100" className="w-full px-3 py-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                      <input type="number" value={newCommission} onChange={e => setNewCommission(e.target.value)} min="1" max="100" className="w-full px-3 py-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm bg-white text-emerald-900" />
                     </div>
                   </div>
                   <button 
@@ -321,15 +331,15 @@ export default function ProductsAndLinksPage() {
                           <input 
                             type="text" 
                             readOnly 
-                            value={link.trackingUrl || `https://${shopifyDomain}/discount/${link.discountCode}?redirect=/products/${selectedProduct.handle}`}
-                            className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none"
+                            value={getDisplayUrl(link)}
+                            className="flex-1 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none"
                           />
                           <button 
-                            onClick={() => copyToClipboard(link.trackingUrl || `https://${shopifyDomain}/discount/${link.discountCode}?redirect=/products/${selectedProduct.handle}`)}
+                            onClick={() => copyToClipboard(getDisplayUrl(link))}
                             className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors"
                             title="Copy link"
                           >
-                            {copiedLink === (link.trackingUrl || `https://${shopifyDomain}/discount/${link.discountCode}?redirect=/products/${selectedProduct.handle}`) ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                            {copiedLink === getDisplayUrl(link) ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                           </button>
                         </div>
                       </div>
